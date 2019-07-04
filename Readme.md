@@ -35,3 +35,6 @@ cf create-service p-service-registry standard discovery-server
 cf create-service p-config-server standard config-server -c '{"git":{"uri":"https://github.com/doddatpivotal/dragonstone-finance.git","searchPaths":"dragonstone-finance-config","label":"master"}}'
 cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.io/pcfone/dpfeffer"}'
 cf create-service p.mysql db-small app-db
+
+http https://auditor-api.apps.pcfone.io/trades
+http https://ratings-api.apps.pcfone.io/ratings
