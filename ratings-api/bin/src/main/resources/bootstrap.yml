@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ratings-api
+  profiles:
+    active: local

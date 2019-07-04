@@ -1,0 +1,15 @@
+logging:
+  level:
+     io:
+        pivotal: DEBUG
+spring:
+  sleuth:
+    sampler:
+      probability: 1.0
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

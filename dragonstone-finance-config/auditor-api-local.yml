@@ -1,0 +1,10 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/auditor_db?serverTimezone=UTC
+    username: user
+    password: KeepItSimple1!
+    initialization-mode: always
+
+
