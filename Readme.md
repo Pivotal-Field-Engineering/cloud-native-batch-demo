@@ -29,3 +29,9 @@ TODO
 # Note on DB's
 - rating table does not grow, so no incrementing apis.  JPA creates table through API launch
 
+
+
+cf create-service p-service-registry standard discovery-server 
+cf create-service p-config-server standard config-server -c '{"git":{"uri":"https://github.com/doddatpivotal/dragonstone-finance.git","searchPaths":"dragonstone-finance-config","label":"master"}}'
+cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.io/pcfone/dpfeffer"}'
+cf create-service p.mysql db-small app-db
