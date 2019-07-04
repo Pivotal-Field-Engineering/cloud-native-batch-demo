@@ -24,6 +24,7 @@ What we have
 
 TODO
 - Review all files
+- Add the api call
 
 # Note on DB's
 - rating table does not grow, so no incrementing apis.  JPA creates table through API launch
