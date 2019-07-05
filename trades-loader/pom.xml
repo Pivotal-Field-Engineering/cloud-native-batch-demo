@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.pivotal.dragonstone-finance</groupId>
 	<artifactId>trades-loader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3</version>
 	<name>trades-loader</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -18,7 +18,16 @@
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Greenwich.SR1</spring-cloud.version>
 		<spring-cloud-sleuth.version>2.1.2.RELEASE</spring-cloud-sleuth.version>
+		<distribution.management.release.id>bintray</distribution.management.release.id>
+		<distribution.management.release.url>https://api.bintray.com/maven/dpfeffer/maven-repo/scdf-batch</distribution.management.release.url>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>${distribution.management.release.id}</id>
+			<url>${distribution.management.release.url}</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>

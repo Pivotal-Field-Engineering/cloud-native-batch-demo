@@ -38,3 +38,21 @@ cf create-service p.mysql db-small app-db
 
 http https://auditor-api.apps.pcfone.io/trades
 http https://ratings-api.apps.pcfone.io/ratings
+
+
+
+## SCDF Deployments
+
+java -jar spring-cloud-dataflow-shell-2.1.2.RELEASE.jar
+dataflow config server https://dataflow-server.apps.pcfone.io
+
+app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.2
+
+task create trades-loader-task --definition trades-loader
+
+task validate trades-loader-task
+
+task launch trades-loader-task --arguments "--localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.trades-loader-task.cloudfoundry.services=app-db,config-server,discovery-server"
+
+
+app register --name analytics-scdf-sink --type sink --uri maven://io.pivotal.analytics:analytics-scdf-sink:1.1.6
