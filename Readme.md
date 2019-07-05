@@ -22,9 +22,6 @@ What we have
 - Multiple datasources
 - 
 
-TODO
-- Review all files
-- Add the api call
 
 # Note on DB's
 - rating table does not grow, so no incrementing apis.  JPA creates table through API launch
@@ -40,19 +37,44 @@ http https://auditor-api.apps.pcfone.io/trades
 http https://ratings-api.apps.pcfone.io/ratings
 
 
+## Task App Maven Deployments
+
+mvn deploy -Ddistribution.management.release.id=bintray -Ddistribution.management.release.url=https://api.bintray.com/maven/dpfeffer/maven-repo/scdf-batch
+
 
 ## SCDF Deployments
 
 java -jar spring-cloud-dataflow-shell-2.1.2.RELEASE.jar
 dataflow config server https://dataflow-server.apps.pcfone.io
 
-app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.2
-
+app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.3
+app default --id task:trades-loader --version 0.0.3
+app info trades-loader --type task
 task create trades-loader-task --definition trades-loader
-
 task validate trades-loader-task
+task launch trades-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.trades-loader-task.cloudfoundry.services=app-db,config-server,discovery-server"
 
-task launch trades-loader-task --arguments "--localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.trades-loader-task.cloudfoundry.services=app-db,config-server,discovery-server"
+app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.2
+app default --id task:ratings-loader --version 0.0.2
+app info ratings-loader --type task
+task create ratings-loader-task --definition ratings-loader
+task validate ratings-loader-task
+task launch ratings-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.trades-loader-task.cloudfoundry.services=app-db,config-server,discovery-server"
 
 
-app register --name analytics-scdf-sink --type sink --uri maven://io.pivotal.analytics:analytics-scdf-sink:1.1.6
+
+Tests:
+- DONE: Access ratings-api
+- DONE: Access auditor-api
+- DONE: Run trades-loader
+- DONE: Run ratings-loader
+
+TODO:
+- Review all files
+- Add the api call
+- Update readme
+- Consider snapshot storage in jcenter
+
+Work Arounds:
+- OSS SDCF (waiting for SCDF for PCF 1.5.1)
+- Global binding of services (waiting for instructions on how to have app specific bindings for task)

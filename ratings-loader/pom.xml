@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.pivotal.dragonstone-finance</groupId>
 	<artifactId>ratings-loader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>ratings-loader</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -18,6 +18,13 @@
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Greenwich.SR1</spring-cloud.version>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>${distribution.management.release.id}</id>
+			<url>${distribution.management.release.url}</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>
