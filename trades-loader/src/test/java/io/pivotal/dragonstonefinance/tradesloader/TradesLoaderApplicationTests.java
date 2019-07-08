@@ -46,7 +46,7 @@ public class TradesLoaderApplicationTests {
         List<Map<String, Object>> TradesList = jdbcTemplate.queryForList(
             "select * from trade");
 
-        assertEquals("Incorrect number of results", 1, TradesList.size());
+        assertEquals("Incorrect number of results", 3, TradesList.size());
 
     }
 
