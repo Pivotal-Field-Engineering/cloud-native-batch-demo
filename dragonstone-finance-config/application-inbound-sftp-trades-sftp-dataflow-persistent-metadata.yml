@@ -1,0 +1,15 @@
+sftp:
+  factory:
+    username: scdf
+    host: sftp.gcp.winterfell.live
+    filename-pattern: '*.csv'
+    remote-dir: /home/scdf/trades-remote-files/
+    local-dir: /var/scdf/trades-shared-files/
+    allow-unknown-keys: true
+  auto-create-local-dir: true
+  delete-remote-files: true
+task:
+  launch:
+    request:
+      taskName: trades-loader-task
+      deployment-properties: deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,deployer.trades-loader.memory=768
