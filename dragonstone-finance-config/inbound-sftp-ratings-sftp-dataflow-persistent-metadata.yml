@@ -1,0 +1,15 @@
+sftp:
+  factory:
+    username: scdf
+    host: sftp.gcp.winterfell.live
+    filename-pattern: '*.csv'
+    remote-dir: /home/scdf/ratings-remote-files/
+    local-dir: /var/scdf/ratings-shared-files/
+    allow-unknown-keys: true
+  auto-create-local-dir: true
+  delete-remote-files: true
+task:
+  launch:
+    request:
+      taskName: ratings-loader-task
+      deployment-properties: deployer.ratings-loader.cloudfoundry.services=app-db,discovery-server,volume-service,deployer.ratings-loader.memory=768
