@@ -3,6 +3,7 @@ package io.pivotal.dragonstonefinance.tradesloader.config;
 import io.pivotal.dragonstonefinance.tradesloader.domain.Trade;
 import io.pivotal.dragonstonefinance.tradesloader.mapper.fieldset.TradeFieldSetMapper;
 import io.pivotal.dragonstonefinance.tradesloader.processor.TradeItemProcessor;
+import io.pivotal.dragonstonefinance.tradesloader.tasklet.FileDeletingTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
@@ -87,17 +89,17 @@ public class BatchJobConfiguration {
     }
 
     @Bean
-    public Job ratingsLoaderJob() {
+    public Job tradesLoaderJob() {
         return jobBuilderFactory.get("tradesLoaderJob")
             .incrementer(new RunIdIncrementer())
-            .flow(step1())
-            .end()
+            .start(step1())
+            .next(step2())
             .build();
     }
 
     @Bean
     public Step step1() {
-        return stepBuilderFactory.get("load")
+        return stepBuilderFactory.get("load-data")
             .<Trade, Trade>chunk(10)
             .reader(reader(null))
             .processor(processor())
@@ -105,5 +107,15 @@ public class BatchJobConfiguration {
             .build();
     }
 
+    @Bean
+    public Step step2() {
+
+        FileDeletingTasklet task = new FileDeletingTasklet();
+        task.setResourceLoader(resourceLoader);
+
+        return stepBuilderFactory.get("delete-source-file")
+            .tasklet(task)
+            .build();
+    }
 
 }

@@ -23,17 +23,17 @@ What we have
 - 
 
 
-# Note on DB's
-- rating table does not grow, so no incrementing apis.  JPA creates table through API launch
-
-
-
+# Create Services
 cf create-service p-service-registry standard discovery-server 
 cf create-service p-config-server standard config-server -c '{"git":{"uri":"https://github.com/doddatpivotal/dragonstone-finance.git","searchPaths":"dragonstone-finance-config","label":"master"}}'
-// cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.io/pcfone/dpfeffer"}'
 cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.io/pcfone/dpfeffer","uid":"$EMP_ID","gid":"$EMP_ID", "mount":"/var/scdf"}'
 cf create-service p.mysql db-small app-db
 cf create-service p-rabbitmq standard rabbit
+
+cd auditor-api
+cf push
+cd ratings-api
+cf push
 
 http https://auditor-api.apps.pcfone.io/trades
 http https://ratings-api.apps.pcfone.io/ratings
@@ -43,13 +43,14 @@ http https://ratings-api.apps.pcfone.io/ratings
 
 for trades-loader
 ```bash
-mvn deploy -Ddistribution.management.release.id=bintray -Ddistribution.management.release.url=https://api.bintray.com/maven/dpfeffer/maven-repo/trades-loader
+mvn clean deploy -Ddistribution.management.release.id=bintray -Ddistribution.management.release.url=https://api.bintray.com/maven/dpfeffer/maven-repo/trades-loader
 ```
 > remember to publish
+
 for ratings-loader
 
 ```bash
-mvn deploy -Ddistribution.management.release.id=bintray -Ddistribution.management.release.url=https://api.bintray.com/maven/dpfeffer/maven-repo/ratings-loader
+mvn clean deploy -Ddistribution.management.release.id=bintray -Ddistribution.management.release.url=https://api.bintray.com/maven/dpfeffer/maven-repo/ratings-loader
 ```
 > remember to publish
 
@@ -58,32 +59,36 @@ mvn deploy -Ddistribution.management.release.id=bintray -Ddistribution.managemen
 java -jar spring-cloud-dataflow-shell-2.1.2.RELEASE.jar
 dataflow config server https://dataflow-server.apps.pcfone.io
 
-app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.6
-app default --id task:trades-loader --version 0.0.6
+app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.9
+app default --id task:trades-loader --version 0.0.9
 app info trades-loader --type task
 task create trades-loader-task --definition trades-loader
 task validate trades-loader-task
-task launch trades-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,deployer.trades-loader.memory=768"
+task launch trades-loader-task --arguments "localFilePath=classpath:data1.csv" --properties "deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,deployer.trades-loader.memory=768"
 
-app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.2
-app default --id task:ratings-loader --version 0.0.2
+app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.20
+app default --id task:ratings-loader --version 0.0.20
 app info ratings-loader --type task
 task create ratings-loader-task --definition ratings-loader
 task validate ratings-loader-task
-task launch ratings-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.fail-on-job-failure=true" --properties "deployer.ratings-loader.cloudfoundry.services=app-db,config-server,volume-service,deployer.ratings-loader.memory=768"
-
+task launch ratings-loader-task --arguments "localFilePath=classpath:data1.csv" --properties "deployer.ratings-loader.cloudfoundry.services=app-db,config-server,volume-service,deployer.ratings-loader.memory=768"
 
 app import https://dataflow.spring.io/rabbitmq-maven-latest
 
 
 
 
-app register sftp-dataflow-persistent-metadata --type source --uri maven://org.springframework.cloud.stream.app:sftp-dataflow-source-rabbit:2.1.1
+app register sftp-dataflow-persistent-metadata --type source --uri maven://io.pivotal.dragonstone-finance:sftp-dataflow-source-rabbit:2.1.7
+app default --id source:sftp-dataflow-persistent-metadata --version 2.1.7
+
+stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=<YOUR_PASSWORD> | task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io" 
+stream deploy inbound-sftp-trades --properties "deployer.task-launcher-dataflow.memory=768,deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
+
+stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=<YOUR_PASSWORD> | task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io" 
+stream deploy inbound-sftp-ratings --properties "deployer.task-launcher-dataflow.memory=768,deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
 
 
-// OUT OF DATE: stream create inbound-sftp --definition "ftp --username=$USERNAME --password=$PW --host=ftp.101323.instanturl.net --allow-unknown-keys=true --remote-dir=webspace/httpdocs/dragonstone/trades --local-dir=/var/scdf/shared-files/ --task.launch.request.taskName=trades-loader-task | task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io"
 
-stream deploy inbound-ftp
 
 Tests:
 - DONE: Access ratings-api

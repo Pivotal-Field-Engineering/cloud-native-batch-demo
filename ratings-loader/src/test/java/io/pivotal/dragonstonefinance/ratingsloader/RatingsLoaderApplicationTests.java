@@ -42,7 +42,7 @@ public class RatingsLoaderApplicationTests {
 
         assertEquals("Incorrect batch status", BatchStatus.COMPLETED, jobExecution.getStatus());
 
-        assertEquals("Invalid number of step executions", 1, jobExecution.getStepExecutions().size());
+        assertEquals("Invalid number of step executions", 2, jobExecution.getStepExecutions().size());
 
         List<Map<String, Object>> ratingsList = jdbcTemplate.queryForList(
             "select symbol, value, analyst from rating");

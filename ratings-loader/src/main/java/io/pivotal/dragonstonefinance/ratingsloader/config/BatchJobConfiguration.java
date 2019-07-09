@@ -3,6 +3,7 @@ package io.pivotal.dragonstonefinance.ratingsloader.config;
 import io.pivotal.dragonstonefinance.ratingsloader.domain.Rating;
 import io.pivotal.dragonstonefinance.ratingsloader.mapper.fieldset.RatingFieldSetMapper;
 import io.pivotal.dragonstonefinance.ratingsloader.processor.RatingItemProcessor;
+import io.pivotal.dragonstonefinance.ratingsloader.tasklet.FileDeletingTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -29,28 +30,23 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchJobConfiguration {
 
-    @Autowired
-    @Qualifier(value = "appDataSource")
-    private final DataSource appDataSource = null;
+    private final DataSource appDataSource;
+
+    private final ResourceLoader resourceLoader;
+
+    private final JobBuilderFactory jobBuilderFactory;
+
+    private final StepBuilderFactory stepBuilderFactory;
 
     @Autowired
-    private final ResourceLoader resourceLoader = null;
-
-    @Autowired
-    private final JobBuilderFactory jobBuilderFactory = null;
-
-    @Autowired
-    private final StepBuilderFactory stepBuilderFactory = null;
-
-//    @Autowired
-//    public BatchJobConfiguration(@Qualifier(value="appDataSource") final DataSource appDataSource, final JobBuilderFactory jobBuilderFactory,
-//                              final StepBuilderFactory stepBuilderFactory,
-//                              final ResourceLoader resourceLoader) {
-//        this.appDataSource = appDataSource;
-//        this.resourceLoader = resourceLoader;
-//        this.jobBuilderFactory = jobBuilderFactory;
-//        this.stepBuilderFactory = stepBuilderFactory;
-//    }
+    public BatchJobConfiguration(@Qualifier(value="appDataSource") final DataSource appDataSource, final JobBuilderFactory jobBuilderFactory,
+                              final StepBuilderFactory stepBuilderFactory,
+                              final ResourceLoader resourceLoader) {
+        this.appDataSource = appDataSource;
+        this.resourceLoader = resourceLoader;
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+    }
 
     @Bean
     @StepScope
@@ -91,8 +87,8 @@ public class BatchJobConfiguration {
     public Job ratingsLoaderJob() {
         return jobBuilderFactory.get("ratingsLoaderJob")
             .incrementer(new RunIdIncrementer())
-            .flow(step1())
-            .end()
+            .start(step1())
+            .next(step2())
             .build();
     }
 
@@ -106,5 +102,14 @@ public class BatchJobConfiguration {
             .build();
     }
 
+    @Bean
+    public Step step2() {
 
+        FileDeletingTasklet task = new FileDeletingTasklet();
+        task.setResourceLoader(resourceLoader);
+
+        return stepBuilderFactory.get("delete-source-file")
+            .tasklet(task)
+            .build();
+    }
 }
