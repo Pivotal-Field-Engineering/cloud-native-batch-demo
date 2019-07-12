@@ -5,7 +5,6 @@ import io.pivotal.dragonstonefinance.tradesloader.domain.Rating;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

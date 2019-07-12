@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.pivotal.dragonstone-finance</groupId>
 	<artifactId>trades-loader</artifactId>
-	<version>0.0.9</version>
+	<version>0.0.10</version>
 	<name>trades-loader</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -54,10 +54,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-task</artifactId>
+			<version>2.2.0.BUILD-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-task-batch</artifactId>
+			<version>2.2.0.BUILD-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.pivotal.spring.cloud</groupId>
@@ -116,16 +118,14 @@
 
 	<repositories>
 		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/libs-snapshot-local</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
+			<id>repository.spring.milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+		<repository>
+			<id>repository.spring.snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>https://repo.spring.io/snapshot</url>
 		</repository>
 	</repositories>
-
 </project>

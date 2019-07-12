@@ -1,6 +1,6 @@
 spring:
   datasource:
-    jdbc-url: jdbc:h2:mem:testdb
+    jdbc-url: jdbc:h2:mem:testdb;MODE=MYSQL
     driverClassName: org.h2.Driver
     username: sa
     password: password
@@ -10,7 +10,7 @@ spring:
       enabled: false
 app:
   datasource:
-    jdbc-url: jdbc:h2:mem:testdb
+    jdbc-url: jdbc:h2:mem:testdb;MODE=MYSQL
     driverClassName: org.h2.Driver
     username: sa
     password: password

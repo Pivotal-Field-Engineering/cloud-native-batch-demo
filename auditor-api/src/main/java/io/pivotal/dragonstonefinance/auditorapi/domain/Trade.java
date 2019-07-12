@@ -23,6 +23,7 @@ public class Trade {
     private BigDecimal amount;
     private BigDecimal shares;
     private String rating;
+    private Date tradeDateTime;
     private Date updateDateTime;
 
 }

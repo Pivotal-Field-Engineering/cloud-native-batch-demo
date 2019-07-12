@@ -35,6 +35,7 @@ public class TradeFieldSetMapper implements FieldSetMapper<Trade> {
             BigDecimal.valueOf(fieldSet.readDouble(2)),
             BigDecimal.valueOf(fieldSet.readDouble(3)),
             null,
-            tradeDateTime);
+            tradeDateTime,
+            null);
     }
 }

@@ -60,18 +60,18 @@ java -jar spring-cloud-dataflow-shell-2.1.2.RELEASE.jar
 dataflow config server https://dataflow-server.apps.pcfone.io
 
 app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.9
-app default --id task:trades-loader --version 0.0.9
+app default --id task:trades-loader --version 0.0.10
 app info trades-loader --type task
 task create trades-loader-task --definition trades-loader
 task validate trades-loader-task
-task launch trades-loader-task --arguments "localFilePath=classpath:data1.csv" --properties "deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,deployer.trades-loader.memory=768"
+task launch trades-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.jobNames=tradesLoaderJob" --properties "deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service deployer.trades-loader.memory=768"
 
-app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.20
-app default --id task:ratings-loader --version 0.0.20
+app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.22
+app default --id task:ratings-loader --version 0.0.23
 app info ratings-loader --type task
 task create ratings-loader-task --definition ratings-loader
 task validate ratings-loader-task
-task launch ratings-loader-task --arguments "localFilePath=classpath:data1.csv" --properties "deployer.ratings-loader.cloudfoundry.services=app-db,config-server,volume-service,deployer.ratings-loader.memory=768"
+task launch ratings-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.failOnJobFailure=true" --properties "deployer.ratings-loader.cloudfoundry.services=app-db,config-server,volume-service deployer.ratings-loader.memory=768"
 
 app import https://dataflow.spring.io/rabbitmq-maven-latest
 
@@ -81,12 +81,13 @@ app import https://dataflow.spring.io/rabbitmq-maven-latest
 app register sftp-dataflow-persistent-metadata --type source --uri maven://io.pivotal.dragonstone-finance:sftp-dataflow-source-rabbit:2.1.7
 app default --id source:sftp-dataflow-persistent-metadata --version 2.1.7
 
-stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=<YOUR_PASSWORD> | task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io" 
-stream deploy inbound-sftp-trades --properties "deployer.task-launcher-dataflow.memory=768,deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
+stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=KeepItSimple1! > :task-launcher-dataflow-destination"
+stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=KeepItSimple1! > :task-launcher-dataflow-destination" 
+stream create process-task-launch-requests --definition ":task-launcher-dataflow-destination > task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io"
 
-stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=<YOUR_PASSWORD> | task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io" 
-stream deploy inbound-sftp-ratings --properties "deployer.task-launcher-dataflow.memory=768,deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
-
+stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
+stream deploy inbound-sftp-ratings --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"
+stream deploy process-task-launch-requests --properties "deployer.task-launcher-dataflow.memory=768"
 
 
 

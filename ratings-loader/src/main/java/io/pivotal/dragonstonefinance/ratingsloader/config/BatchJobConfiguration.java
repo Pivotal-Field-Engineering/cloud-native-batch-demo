@@ -38,7 +38,6 @@ public class BatchJobConfiguration {
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
     public BatchJobConfiguration(@Qualifier(value="appDataSource") final DataSource appDataSource, final JobBuilderFactory jobBuilderFactory,
                               final StepBuilderFactory stepBuilderFactory,
                               final ResourceLoader resourceLoader) {

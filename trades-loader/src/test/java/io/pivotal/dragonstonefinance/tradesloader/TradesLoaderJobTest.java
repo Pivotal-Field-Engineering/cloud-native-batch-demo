@@ -1,8 +1,10 @@
 package io.pivotal.dragonstonefinance.tradesloader;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -24,8 +27,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TradesLoaderApplication.class)
-@ContextConfiguration(classes = {TradesLoaderApplicationTests.BatchJobTestConfiguration.class})
-public class TradesLoaderApplicationTests {
+@ContextConfiguration(classes = {TradesLoaderJobTest.BatchJobTestConfiguration.class})
+public class TradesLoaderJobTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -33,8 +36,13 @@ public class TradesLoaderApplicationTests {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Before
+    public void setUp() throws Exception {
+        jdbcTemplate.update("delete from trade");
+    }
+
     @Test
-    public void testBatchDataProcessing() throws Exception {
+    public void testLoading() throws Exception {
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder().addString(
             "localFilePath", "classpath:data.csv").toJobParameters());
@@ -60,7 +68,15 @@ public class TradesLoaderApplicationTests {
 
         @Bean
         public JobLauncherTestUtils jobLauncherTestUtils() {
-            return new JobLauncherTestUtils();
+
+            return new JobLauncherTestUtils() {
+                @Override
+                @Autowired
+                public void setJob(@Qualifier("tradesLoaderJob") Job job) {
+                    super.setJob(job);
+                }
+            };
+
         }
 
         @Bean

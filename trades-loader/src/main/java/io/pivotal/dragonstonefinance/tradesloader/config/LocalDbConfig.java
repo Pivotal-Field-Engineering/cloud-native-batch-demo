@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @Profile("!cloud")
-public class DbConfig {
+public class LocalDbConfig {
 
     @Primary
     @Bean

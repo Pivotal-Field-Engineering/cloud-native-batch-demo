@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -20,6 +18,7 @@ public class Trade {
     private BigDecimal amount;
     private BigDecimal shares;
     private String rating;
+    private Date tradeDateTime;
     private Date updateDateTime;
 
 }
