@@ -13,4 +13,3 @@ task:
     request:
       taskName: trades-loader-task
       deployment-properties: deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,deployer.trades-loader.memory=768
-      args: --spring.cloud.task.batch.jobNames=tradesLoaderJob

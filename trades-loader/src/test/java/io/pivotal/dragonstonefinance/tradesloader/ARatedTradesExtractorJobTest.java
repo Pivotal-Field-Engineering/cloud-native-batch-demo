@@ -54,12 +54,14 @@ public class ARatedTradesExtractorJobTest {
             "values" +
             "   (1, 'abc', 12, 'A', 12, 'ABC', '2019-06-26T01:01:00.000Z','" + sdf.format(new Date()) + "')");
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder().addString(
-            "localFilePath", "target/").toJobParameters());
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder()
+            .addString("localFilePath", "target/")
+            .addString("tempDir", "target/")
+            .toJobParameters());
 
         assertEquals("Incorrect batch status", BatchStatus.COMPLETED, jobExecution.getStatus());
 
-        assertEquals("Invalid number of step executions", 1, jobExecution.getStepExecutions().size());
+        assertEquals("Invalid number of step executions", 2, jobExecution.getStepExecutions().size());
 
     }
 

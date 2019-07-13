@@ -1,5 +1,6 @@
 package io.pivotal.dragonstonefinance.tradesloader.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,8 @@ public class CloudDbConfig extends AbstractCloudConfig {
 
     @Primary
     @Bean
-    public DataSource dataSource() {
-        return connectionFactory().dataSource("mysql");
+    public DataSource dataSource(@Value("${io.pivotal.dataflow-db-service-name:mysql}") String serviceName) {
+        return connectionFactory().dataSource(serviceName);
     }
 
     @Bean

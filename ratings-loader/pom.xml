@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.pivotal.dragonstone-finance</groupId>
 	<artifactId>ratings-loader</artifactId>
-	<version>0.0.23</version>
+	<version>0.0.25</version>
 	<name>ratings-loader</name>
 	<description>Demo project for Spring Boot</description>
 

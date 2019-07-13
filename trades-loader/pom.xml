@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.pivotal.dragonstone-finance</groupId>
 	<artifactId>trades-loader</artifactId>
-	<version>0.0.10</version>
+	<version>0.0.23</version>
 	<name>trades-loader</name>
 	<description>Demo project for Spring Boot</description>
 

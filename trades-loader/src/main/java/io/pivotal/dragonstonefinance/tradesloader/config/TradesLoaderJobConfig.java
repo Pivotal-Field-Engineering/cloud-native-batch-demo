@@ -69,7 +69,7 @@ public class TradesLoaderJobConfig extends BaseJobConfig {
             .name("reader")
             .resource(resourceLoader.getResource(filePath))
             .delimited()
-            .names(new String[]{"AccountNumber", "Symbol", "Amount", "Shares", "TradeDateTime", "UpdateDateTime"})
+            .names(new String[]{"AccountNumber", "Symbol", "Amount", "Shares", "TradeDateTime"})
             .fieldSetMapper(new TradeFieldSetMapper())
             .linesToSkip(1)
             .build();
@@ -86,9 +86,9 @@ public class TradesLoaderJobConfig extends BaseJobConfig {
             .beanMapped()
             .dataSource(this.dataSource)
             .sql("INSERT INTO trade " +
-                "(trade_id, account_number, symbol, amount, shares, rating, update_date_time) " +
+                "(trade_id, account_number, symbol, amount, shares, rating, trade_date_time, update_date_time) " +
                 "VALUES " +
-                "(:tradeId, :accountNumber, :symbol, :amount, :shares, :rating, :updateDateTime)")
+                "(:tradeId, :accountNumber, :symbol, :amount, :shares, :rating, :tradeDateTime, :updateDateTime)")
             .build();
     }
 
