@@ -84,6 +84,10 @@ What we have
 - One of the batch apps has two different batch jobs defined in the same app
 - ETL File to DB and DB to file
 - Use of scheduler
+- Bintray for custom maven repo
+
+## Maven Repo
+- I used [bintray](https://bintray.com) to publish custom Spring Cloud Task and Spring Cloud Stream apps and then added reference to this maven repository to data flow server
 
 ## SFTP Server Setup
 Used [this blog](https://medium.com/@biancalorenpadilla/sftp-google-cloud-storage-d559fd16e074) to create sftp server on GCP for the demo.  Remember to create firewall rule allowing inbound access on 22.
