@@ -19,8 +19,8 @@ dataflow config server https://dataflow-server.apps.pcfone.io
 
 
 
-stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=KeepItSimple1! > :task-launcher-dataflow-destination"
-stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=KeepItSimple1! > :task-launcher-dataflow-destination" 
+stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination"
+stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination" 
 stream create process-task-launch-requests --definition ":task-launcher-dataflow-destination > task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io"
 
 stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=mysql,config-server"

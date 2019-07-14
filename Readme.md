@@ -6,7 +6,7 @@ and Pivotal Application Services to deploy batch apps in a cloud native way.
 
 >Inspired by: [Need 24x7 ETL? Then Move to Cloud Native File Ingest with Spring Cloud Data Flow](https://content.pivotal.io/blog/need-24x7-etl-then-move-to-cloud-native-file-ingest-with-spring-cloud-data-flow)
 
-This was first demoed at Spring One Tour Philadelphia and the slides can be accessed [here](https://docs.google.com/presentation/d/1-_Bfer_IX-E17DPjf9agR3tXKl9SPlWy29fzEKyqm1E/edit?usp=sharing)
+This was first demoed at Spring One Tour Philadelphia and the slides can be accessed [here](https://docs.google.com/presentation/d/1-_Bfer_IX-E17DPjf9agR3tXKl9SPlWy29fzEKyqm1E/edit?usp=sharing).
 
 # Setup
 See [Demo instructions](docs/demo.md)
