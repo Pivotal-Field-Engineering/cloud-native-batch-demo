@@ -190,6 +190,11 @@ stream destroy process-task-launch-requests
 cf d a-trades-extractor-task -f
 ```
 
+7. Delete files from volume service
+```bash
+http https://volume-demo-atrades.apps.pcfone.io/delete_all
+```
+
 ## Tear Down Pre-reqs
 
 1. Complete the previous teardown steps
