@@ -155,9 +155,10 @@ http https://auditor-api.apps.pcfone.io/trades
 cf delete ratings-api -f -r
 ```
 
-2. Delete ratings data
+2. Delete ratings and trade data
 ```sql
 delete from rating;
+delete from trade;
 ```
 
 3. Delete scheduled task definition
@@ -182,6 +183,11 @@ stream undeploy process-task-launch-requests
 stream destroy inbound-sftp-ratings
 stream destroy inbound-sftp-trades
 stream destroy process-task-launch-requests
+```
+
+6. Delete the scheduled task app
+```bash
+cf d a-trades-extractor-task -f
 ```
 
 ## Tear Down Pre-reqs
