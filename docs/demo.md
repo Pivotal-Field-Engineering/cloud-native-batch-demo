@@ -83,8 +83,8 @@ cf dataflow-shell data-flow
 
 4. Register Task Apps
 ```scdf
-app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.25
-app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.23
+app register ratings-loader --type task --uri maven://io.pivotal.dragonstone-finance:ratings-loader:0.0.26
+app register trades-loader --type task --uri maven://io.pivotal.dragonstone-finance:trades-loader:0.0.24
 ```
 
 5. Create Tasks
@@ -103,7 +103,7 @@ http https://ratings-api.apps.pcfone.io/ratings
 ```scdf
 task launch ratings-loader-task --arguments "localFilePath=classpath:data.csv --spring.cloud.task.batch.failOnJobFailure=true" --properties "deployer.ratings-loader.cloudfoundry.services=app-db,config-server,volume-service deployer.ratings-loader.memory=768"
 ```
-- Show app is no in cloud foundry
+- Show app is now in cloud foundry
 ```bash
 cf apps
 ```
@@ -119,12 +119,12 @@ http https://ratings-api.apps.pcfone.io/ratings
 
 7. Create the streams
 ```scdf
-stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD :task-launcher-dataflow-destination"
+stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination"
 stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination" 
 stream create process-task-launch-requests --definition ":task-launcher-dataflow-destination > task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io"
 
-stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=relational-e918cdd7-4b79-49aa-945c-ecace0a007b7,config-server,volume-service"
-stream deploy inbound-sftp-ratings --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=relational-e918cdd7-4b79-49aa-945c-ecace0a007b7,config-server,volume-service"
+stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=app-db,config-server,volume-service"
+stream deploy inbound-sftp-ratings --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=app-db,config-server,volume-service"
 stream deploy process-task-launch-requests --properties "deployer.task-launcher-dataflow.memory=768"
 ```
 
@@ -137,7 +137,7 @@ stream deploy process-task-launch-requests --properties "deployer.task-launcher-
 - Check on the SCDF UI for executions
 - Check on the api to for any new data with ratings 
 ```bash
-http https://trades-api.apps.pcfone.io/trades
+http https://auditor-api.apps.pcfone.io/trades
 ```
 
 9. Schedule the extract task

@@ -25,13 +25,17 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
             localFilePath = "file:" + localFilePath;
         }
 
-
-        File file = resourceLoader.getResource(localFilePath).getFile();
-        log.info("Deleting file: " + localFilePath);
-        boolean deleted = file.delete();
-        if (!deleted) {
-            throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());
+        if(localFilePath.startsWith("classpath:")) {
+            log.info("Skipping delete as we are working on classpath file");
+        } else {
+            File file = resourceLoader.getResource(localFilePath).getFile();
+            log.info("Deleting file: " + localFilePath);
+            boolean deleted = file.delete();
+            if (!deleted) {
+                throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());
+            }
         }
+
         return RepeatStatus.FINISHED;
     }
 
