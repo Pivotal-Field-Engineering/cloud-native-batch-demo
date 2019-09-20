@@ -7,7 +7,7 @@
 cf create-service p-dataflow standard data-flow -c '{"concurrent-task-limit": 2, "scheduler": {"name": "scheduler-for-pcf", "plan": "standard"},"maven.remote-repositories.bintray.url": "https://dl.bintray.com/dpfeffer/maven-repo"}'
 
 cf create-service p-service-registry standard discovery-server 
-cf create-service p-config-server standard config-server -c '{"git":{"uri":"https://github.com/doddatpivotal/dragonstone-finance.git","searchPaths":"dragonstone-finance-config","label":"master"}}'
+cf create-service p-config-server standard config-server -c '{"git":{"uri":"https://github.com/Pivotal-Field-Engineering/dragonstone-finance.git","searchPaths":"dragonstone-finance-config","label":"master"}}'
 
 cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.io/pcfone/dpfeffer","uid":"$EMPID","gid":"$EMPID", "mount":"/var/scdf"}'
 cf create-service p.mysql db-small app-db
