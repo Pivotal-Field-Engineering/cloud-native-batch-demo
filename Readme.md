@@ -14,7 +14,7 @@ See [Demo instructions](docs/demo.md)
 ## SCDF Deployments
 Common commands while working with the app.
 
-> If you want to get all starter, then use this `app import https://dataflow.spring.io/rabbitmq-maven-latest`
+> If you want to get all the spring cloud data flow start apps, then use this `app import https://dataflow.spring.io/rabbitmq-maven-latest`
 
 ```bash
 cf create-service p-dataflow standard data-flow -c '{"concurrent-task-limit": 2, "scheduler": {"name": "scheduler-for-pcf", "plan": "standard"},"maven.remote-repositories.bintray.url": "https://dl.bintray.com/dpfeffer/maven-repo"}'

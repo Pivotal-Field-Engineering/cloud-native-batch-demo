@@ -15,7 +15,7 @@ applications:
   instances: 1
   path: ./target/PivotalMySQLWeb-0.0.1-SNAPSHOT.jar
   services:
-    - relational-e918cdd7-4b79-49aa-945c-ecace0a007b7
+    - relational-de67ee92-ce90-40ae-9884-6434c71597d1
 - name: pivotal-mysqlweb-app-db
   memory: 768m
   instances: 1

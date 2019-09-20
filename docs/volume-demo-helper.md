@@ -1,6 +1,6 @@
-# MySql Web Helper
+# Volume Service Web Helper
 
-Use the following aid to easily interact with provisioned mysql dbs
+Use the following aid to easily interact with provisioned volume services
 
 1. Clone the repo: `git clone https://github.com/doddatpivotal/volume-demo`
 2. Build the project: `mvn clean install`

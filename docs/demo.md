@@ -2,10 +2,7 @@
 
 ## Prerequisites
 
-1. Deploy volume demo apps. [Instructions](volume-demo-helper.md)
-2. Deploy pivotal-mysql-web apps.  [Instructions](mysql-web-helper.md)
-3. Window open with pcfone apps manager
-3. Create all services
+1. Create all services
 ```bash
 cf create-service p-dataflow standard data-flow -c '{"concurrent-task-limit": 2, "scheduler": {"name": "scheduler-for-pcf", "plan": "standard"},"maven.remote-repositories.bintray.url": "https://dl.bintray.com/dpfeffer/maven-repo"}'
 
@@ -16,12 +13,15 @@ cf create-service nfs Existing volume-service -c '{"share":"nfs-pcf.pez.pivotal.
 cf create-service p.mysql db-small app-db
 
 ```
+2. Deploy volume demo apps. [Instructions](volume-demo-helper.md)
+3. Deploy pivotal-mysql-web apps.  [Instructions](mysql-web-helper.md)
 4. Deploy auditor-api, but leave ratings-api un-deployed so you can do that in the demo
 ```bash
 cd auditor-api
 cf push
 ```
-5. Delete all data from ratings
+5. Setup sftp server. Used [this blog](https://medium.com/@biancalorenpadilla/sftp-google-cloud-storage-d559fd16e074) to create sftp server on GCP for the demo.  Remember to create firewall rule allowing inbound access on 22.
+6. Delete all data from ratings
 
 ## Demo
 
@@ -34,7 +34,7 @@ cf push
     - SCDF for PCF service
     - scheduler
 - Show that auditor-api has already been deployed
-- Deploy the other
+- Deploy the ratings-api
 - Launch spring cloud data flow
 - Show the apps
 - Register my task apps
@@ -88,14 +88,15 @@ app register trades-loader --type task --uri maven://io.pivotal.dragonstone-fina
 ```
 
 5. Create Tasks
+> Note: Update with the relational database service name  
 ```scdf
-task create ratings-loader-task --definition "ratings-loader --io.pivotal.dataflow-db-service-name=relational-e918cdd7-4b79-49aa-945c-ecace0a007b7"
-task create trades-loader-task --definition "trades-loader --spring.cloud.task.batch.jobNames=tradesLoaderJob --io.pivotal.dataflow-db-service-name=relational-e918cdd7-4b79-49aa-945c-ecace0a007b7"
-task create a-trades-extractor-task --definition "trades-loader --spring.cloud.task.batch.jobNames=aRatedTradesExtractorJob --io.pivotal.dataflow-db-service-name=relational-e918cdd7-4b79-49aa-945c-ecace0a007b7"
+task create ratings-loader-task --definition "ratings-loader --io.pivotal.dataflow-db-service-name=relational-de67ee92-ce90-40ae-9884-6434c71597d1"
+task create trades-loader-task --definition "trades-loader --spring.cloud.task.batch.jobNames=tradesLoaderJob --io.pivotal.dataflow-db-service-name=relational-de67ee92-ce90-40ae-9884-6434c71597d1"
+task create a-trades-extractor-task --definition "trades-loader --spring.cloud.task.batch.jobNames=aRatedTradesExtractorJob --io.pivotal.dataflow-db-service-name=relational-de67ee92-ce90-40ae-9884-6434c71597d1"
 ```
 
 6. Test
-- Show now data in ratings
+- Show no data in ratings
 ```bash
 http https://ratings-api.apps.pcfone.io/ratings
 ```
@@ -119,11 +120,14 @@ http https://ratings-api.apps.pcfone.io/ratings
 
 7. Create the streams
 ```scdf
+app register sftp-dataflow-persistent-metadata --type source --uri maven://io.pivotal.dragonstone-finance:sftp-dataflow-source-rabbit:2.1.7
+app import https://dataflow.spring.io/rabbitmq-maven-latest
+
 stream create inbound-sftp-trades --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination"
 stream create inbound-sftp-ratings --definition "sftp-dataflow-persistent-metadata --password=$PASSWORD > :task-launcher-dataflow-destination" 
 stream create process-task-launch-requests --definition ":task-launcher-dataflow-destination > task-launcher-dataflow --spring.cloud.dataflow.client.server-uri=https://dataflow-server.apps.pcfone.io"
 
-stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=app-db,config-server,volume-service"
+stream deploy inbound-sftp-trades --properties "deployer.sftp-dataflow-persistent-metadata.deleteRoute=true,deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=app-db,config-server,volume-service"
 stream deploy inbound-sftp-ratings --properties "deployer.sftp-dataflow-persistent-metadata.memory=768,deployer.sftp-dataflow-persistent-metadata.cloudfoundry.services=app-db,config-server,volume-service"
 stream deploy process-task-launch-requests --properties "deployer.task-launcher-dataflow.memory=768"
 ```
@@ -131,8 +135,8 @@ stream deploy process-task-launch-requests --properties "deployer.task-launcher-
 8. Test the streams
 - Show now data in ratings
 ```bash
-./scripts transfer-trades-data.sh
-./scripts transfer-ratings-data.sh
+./scripts/transfer-trades-data.sh
+./scripts/transfer-ratings-data.sh
 ```
 - Check on the SCDF UI for executions
 - Check on the api to for any new data with ratings 
@@ -145,7 +149,14 @@ http https://auditor-api.apps.pcfone.io/trades
     - Name: `aTradesExtractMinutely` 
     - Cron Expression: `0/1 * 1/1 * ?`
     - Arguments: `localFilePath=/var/scdf/atrades-shared-files/ tempDir=/home/vcap/`
-    - Parameters: `deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,relational-e918cdd7-4b79-49aa-945c-ecace0a007b7 deployer.trades-loader.memory=768`        
+    - Parameters: `deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,relational-de67ee92-ce90-40ae-9884-6434c71597d1
+                   deployer.trades-loader.memory=768`        
+- Using the UI, create a new scheduled task with following info
+    - Name: `aTradesExtractDaily` 
+    - Cron Expression: `0 8 * * ?`
+    - Arguments: `localFilePath=/var/scdf/atrades-shared-files/ tempDir=/home/vcap/`
+    - Parameters: `deployer.trades-loader.cloudfoundry.services=app-db,config-server,discovery-server,volume-service,relational-de67ee92-ce90-40ae-9884-6434c71597d1
+                   deployer.trades-loader.memory=768`        
 - See the executions
 
 ## Tear Down to Repeat Demo
